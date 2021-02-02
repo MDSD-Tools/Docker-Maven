@@ -1,0 +1,52 @@
+name: Docker
+
+on:
+  push:
+    branches:
+      - main
+      - tag_*
+
+env:
+  IMAGE_NAME: maven
+
+jobs:
+  push:
+
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Determine tag name
+        run: |
+          # Strip git ref prefix from version
+          TAG=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Strip "tag_" prefix from branch name
+          [[ "${{ github.ref }}" == "refs/heads/"* ]] && TAG=$(echo $TAG | sed -e 's/^tag_//')
+
+          # Use Docker `latest` tag convention
+          [ "$TAG" == "main" ] && TAG=latest
+          
+          # Set TAG environment variable
+          echo "TAG=$TAG" >> $GITHUB_ENV
+
+      - name: Build image
+        run: docker build . --file Dockerfile --build-arg MAVEN_TAG=$TAG --tag $IMAGE_NAME
+
+      - name: Log into registry
+        run: echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push image
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo TAG=$TAG
+
+          docker tag $IMAGE_NAME $IMAGE_ID:$TAG
+          docker push $IMAGE_ID:$TAG
