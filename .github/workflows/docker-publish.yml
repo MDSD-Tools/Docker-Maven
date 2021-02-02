@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-      - tag_*
+  schedule:
+  - cron: "42 4 * * *"
 
 env:
   IMAGE_NAME: maven
@@ -12,25 +13,17 @@ env:
 jobs:
   push:
 
+    strategy:
+      fail-fast: false
+      matrix:
+        tag: [latest, 3-jdk-11]
+
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    env:
+      TAG:  ${{ matrix.tag }}
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Determine tag name
-        run: |
-          # Strip git ref prefix from version
-          TAG=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-
-          # Strip "tag_" prefix from branch name
-          [[ "${{ github.ref }}" == "refs/heads/"* ]] && TAG=$(echo $TAG | sed -e 's/^tag_//')
-
-          # Use Docker `latest` tag convention
-          [ "$TAG" == "main" ] && TAG=latest
-          
-          # Set TAG environment variable
-          echo "TAG=$TAG" >> $GITHUB_ENV
 
       - name: Build image
         run: docker build . --file Dockerfile --build-arg MAVEN_TAG=$TAG --tag $IMAGE_NAME
