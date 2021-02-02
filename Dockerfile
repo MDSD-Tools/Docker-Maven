@@ -1,4 +1,4 @@
-ARG MAVEN_TAG=INVALID
+ARG MAVEN_TAG=latest
 FROM maven:${MAVEN_TAG}
 
 RUN apt update && \
