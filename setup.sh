@@ -5,7 +5,7 @@ then
     set -e
     echo Installing dependencies using apt
     apt-get update
-    apt-get install -y --no-install-recommends --no-install-suggests libgtk-3-0
+    apt-get install -y --no-install-recommends --no-install-suggests libgtk-3-0 xvfb
     rm -rf /var/lib/apt/lists/*
     exit
 fi
@@ -15,7 +15,7 @@ then
     set -e
     echo Installing dependencies using microdnf
     microdnf update
-    microdnf install gtk3
+    microdnf install gtk3 xorg-x11-server-Xvfb
     exit
 fi
 
