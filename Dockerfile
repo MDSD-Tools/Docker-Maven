@@ -6,4 +6,8 @@ ADD entrypoint.sh /
 RUN /setup.sh && \
     rm -f /setup.sh
 
+ENV DISPLAYNUM=99
+ENV SCREENNUM=0
+ENV DISPLAY=':'$DISPLAYNUM'.'$SCREENNUM
+
 ENTRYPOINT ["/entrypoint.sh"]
