@@ -1,0 +1,4 @@
+#!/bin/sh
+
+exec /entrypoint.sh /usr/bin/mvn "$@"
+

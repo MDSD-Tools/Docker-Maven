@@ -5,6 +5,7 @@ ADD setup.sh /
 ADD entrypoint.sh /
 RUN /setup.sh && \
     rm -f /setup.sh
+ADD ./mvn /usr/local/bin/mvn
 
 ENV DISPLAYNUM=99
 ENV SCREENNUM=0
