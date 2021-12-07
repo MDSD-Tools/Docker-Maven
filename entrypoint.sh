@@ -1,5 +1,4 @@
-#!/bin/sh
+#!/bin/sh -eu
 
-Xvfb :$DISPLAYNUM -screen $SCREENNUM 1920x1080x24 > /dev/null 2>&1 &
-
+/init.sh
 exec /usr/local/bin/mvn-entrypoint.sh "$@"
